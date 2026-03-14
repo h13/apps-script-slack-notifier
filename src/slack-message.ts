@@ -5,12 +5,12 @@ export interface SlackPayload {
   readonly text: string;
 }
 
-function escapeHtml(str: string): string {
+function escapeSlackText(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function formatRow(row: RowEntry): string {
-  const escaped = row.data.map(escapeHtml);
+  const escaped = row.data.map(escapeSlackText);
   return `  Row ${row.index}: ${escaped.join(" | ")}`;
 }
 

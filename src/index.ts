@@ -21,12 +21,21 @@ function checkNewRows(): void {
 
   const payload = buildSlackPayload(newRows, channelId);
 
-  UrlFetchApp.fetch("https://slack.com/api/chat.postMessage", {
+  const response = UrlFetchApp.fetch("https://slack.com/api/chat.postMessage", {
     method: "post",
     contentType: "application/json",
     headers: { Authorization: `Bearer ${token}` },
     payload: JSON.stringify(payload),
+    muteHttpExceptions: true,
   });
+
+  const responseBody = JSON.parse(response.getContentText()) as {
+    ok: boolean;
+    error?: string;
+  };
+  if (!responseBody.ok) {
+    throw new Error(`Slack API error: ${responseBody.error ?? "unknown"}`);
+  }
 
   props.setProperty("LAST_PROCESSED_ROW", String(allRows.length));
 }
