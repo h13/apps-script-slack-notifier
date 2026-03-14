@@ -98,6 +98,15 @@ test/
 - Coverage threshold: 80% for all metrics (configurable in `jest.config.json`)
 - `LAST_PROCESSED_ROW` defaults to `1` on first run to skip the header row
 
+## Apps Script Projects
+
+These projects are publicly viewable:
+
+| Environment | Link |
+|-------------|------|
+| Development | [Open in Apps Script](https://script.google.com/d/1pfBRAp_JKYROuX_KD_4-EImm9SLQhU6CBgxnXKs-ev8wOzByF2QzEUjW/edit) |
+| Production  | [Open in Apps Script](https://script.google.com/d/1qi5u32JHvWmIPpIcyNQEjLzdTjot21qCLpRlWR1BHm4nMq2LdPUw842i/edit) |
+
 ## License
 
 MIT

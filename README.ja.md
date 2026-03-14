@@ -98,6 +98,15 @@ test/
 - カバレッジ閾値: 全メトリクス 80%（`jest.config.json` で変更可）
 - `LAST_PROCESSED_ROW` は初回実行時にデフォルト値 `1` が設定され、ヘッダー行をスキップします
 
+## Apps Script プロジェクト
+
+これらのプロジェクトは閲覧可能です:
+
+| 環境 | リンク |
+|------|--------|
+| Development | [Apps Script で開く](https://script.google.com/d/1pfBRAp_JKYROuX_KD_4-EImm9SLQhU6CBgxnXKs-ev8wOzByF2QzEUjW/edit) |
+| Production  | [Apps Script で開く](https://script.google.com/d/1qi5u32JHvWmIPpIcyNQEjLzdTjot21qCLpRlWR1BHm4nMq2LdPUw842i/edit) |
+
 ## ライセンス
 
 MIT
