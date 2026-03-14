@@ -12,7 +12,7 @@
     "deploy:prod": "pnpm run check && pnpm run build && cp .clasp-prod.json .clasp.json && clasp push",
     "format": "prettier --write .",
     "lint": "eslint --fix src/ test/",
-    "lint:css": "stylelint '**/*.{css,scss,html}'",
+    "lint:css": "stylelint --allow-empty-input '**/*.{css,scss,html}'",
     "lint:html": "htmlhint --ignore 'coverage/**,dist/**' '**/*.html'",
     "prepare": "husky",
     "test": "jest test/ --passWithNoTests --detectOpenHandles --coverage",
