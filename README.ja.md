@@ -1,243 +1,103 @@
-# Apps Script Fleet
+# apps-script-slack-notifier
 
-[![CI](https://github.com/h13/apps-script-fleet/actions/workflows/ci.yml/badge.svg)](https://github.com/h13/apps-script-fleet/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/h13/apps-script-fleet/blob/main/LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D24-green.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
-[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-Template-4285F4.svg)](https://developers.google.com/apps-script)
+[![CI](https://github.com/h13/apps-script-slack-notifier/actions/workflows/ci.yml/badge.svg)](https://github.com/h13/apps-script-slack-notifier/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/h13/apps-script-slack-notifier/blob/main/LICENSE)
+[![Node.js >=24](https://img.shields.io/badge/Node.js-%3E%3D24-brightgreen.svg)](https://nodejs.org/)
+[![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
+[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-4285F4.svg?logo=google&logoColor=white)](https://script.google.com/)
 
 [English](README.md)
 
-**Google Apps Script を組織全体でスケールさせるためのインフラ。**
+Google スプレッドシートに追加された新しい行を検知し、Bot Token 経由で Slack の `chat.postMessage` API に通知する Google Apps Script プロジェクト。[apps-script-fleet](https://github.com/h13/apps-script-fleet) テンプレートから生成。
 
-既存の GAS テンプレートは「1 つのプロジェクトをモダンに開発する方法」を提供します。Apps Script Fleet はその先にある問題を解決します — このテンプレートからリポジトリを作成して Script ID を設定すれば、CI/CD パイプラインがすでに動いている状態でスタートできます。GitHub でも GitLab でも、クラウドでも Self-Managed でも動作します。
+## 動作の仕組み
 
-**[→ クイックスタート](#クイックスタート)** · [含まれるもの](#含まれるもの) · [他のテンプレートとの違い](#他のテンプレートとの違い) · [FAQ](#faq)
+1. **時間駆動トリガー** — Google Apps Script のタイムトリガーが `checkNewRows` を定期実行（例: 5 分ごと）
+2. **新規行の検出** — スプレッドシート全行を取得し、前回処理した行インデックス（`LAST_PROCESSED_ROW`）以降の行を抽出
+3. **Slack 通知** — `UrlFetchApp.fetch` で `https://slack.com/api/chat.postMessage` を呼び出し、新規行の内容を通知
+4. **状態の更新** — `PropertiesService` に最終処理行インデックスを保存し、次回実行時の重複通知を防止
 
-## 課題
+## セットアップ
 
-GAS プロジェクトは小さく始まりますが、増殖します。Slack 通知、レポート自動生成、フォーム処理、Drive のファイル整理 — 気づけば組織に十数個のスクリプトが存在しています。それぞれに必要なもの：
+### 1. Slack App の作成
 
-- TypeScript の設定
-- バンドラ（Rollup, Webpack, Vite）
-- リント・フォーマッタ
-- テスト環境とカバレッジ設定
-- dev / prod の CI/CD ワークフロー
-- clasp の認証管理
-- 依存関係の継続的な更新
+1. [api.slack.com/apps](https://api.slack.com/apps) にアクセスし、新しい App を作成
+2. **OAuth & Permissions** → **Bot Token Scopes** に `chat:write` を追加
+3. App をワークスペースにインストールし、**Bot User OAuth Token**（`xoxb-...`）を取得
+4. 通知先チャンネルの **Channel ID** を確認（チャンネルを右クリック → "チャンネル詳細を表示" → ID をコピー）
+5. Slack App をそのチャンネルに招待: `/invite @your-app-name`
 
-1 プロジェクトあたりのセットアップに 2〜4 時間。10 プロジェクトなら丸 1 週間がボイラープレートに消えます。さらにその後も、10 個の異なる設定を個別にメンテナンスし続けることになります。
+### 2. Google Apps Script へのデプロイ
 
-## 解決策：1 リポ = 1 機能
+```bash
+# clasp 認証（初回のみ）
+pnpm exec clasp login
 
-![アーキテクチャ — 1 リポ 1 機能 + 共有インフラ](docs/architecture.png)
+# .clasp-dev.json を作成してスクリプト ID を設定
+echo '{"scriptId":"YOUR_SCRIPT_ID","rootDir":"dist"}' > .clasp-dev.json
 
-Apps Script Fleet は各 GAS 機能を独立したリポジトリとして扱い、組織レベルの共有インフラで支えます：
-
-- **初回のみの設定**: `CLASPRC_JSON` を組織/グループレベルのシークレットに追加（[GitHub](https://docs.github.com/ja/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-an-organization) または [GitLab](https://docs.gitlab.com/ci/variables/#for-a-group)）。このテンプレートから作成されたすべてのリポが自動的に利用します。
-- **プロジェクトごとの設定（約 5 分）**: テンプレートからリポを作成 → Script ID を設定 → 完了。PR/MR で CI が走り、マージで本番デプロイ。
-- **一括メンテナンス**: [Renovate](https://docs.renovatebot.com/) が全リポの依存関係を自動更新。[Template Sync](.github/workflows/sync-template.yml) がツーリングの改善を上流テンプレートから自動伝播。
-
-違いを一目で：
-
-![Before / After 比較](docs/before-after.png)
-
-## 含まれるもの
-
-| カテゴリ   | ツール                                                 |
-| ---------- | ------------------------------------------------------ |
-| 言語       | TypeScript（strict モード）                            |
-| バンドラ   | Rollup（GAS 互換出力）                                 |
-| デプロイ   | clasp（dev / prod 環境）                               |
-| テスト     | Jest（カバレッジ閾値 80%）                             |
-| リント     | ESLint, Prettier, Stylelint, HTMLHint                  |
-| Git フック | husky + lint-staged                                    |
-| CI/CD      | GitHub Actions + GitLab CI（PR で CI、マージで CD）    |
-| 依存管理   | Renovate（自動更新 + オートマージ）                    |
-| 同期       | Template Sync ワークフロー（上流の設定変更を自動反映） |
-
-その結果 — 開発者の1日はこう変わります：
-
-![開発者の1日：Apps Script Fleet なし vs あり](docs/before-after-human.png)
-
-## 他のテンプレートとの違い
-
-|                    | [Apps Script Engine](https://github.com/WildH0g/apps-script-engine-template) | Apps Script Fleet                                |
-| ------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------ |
-| 設計思想           | 機能豊富な DX                                                                | 最小限の制約                                     |
-| 最適な用途         | 単一の複雑なプロジェクト                                                     | 多数の小さな自動化                               |
-| フロントエンド開発 | Vite + Alpine.js + Tailwind                                                  | 基本的な HTML（GAS 組み込み）                    |
-| テスト             | Vitest（任意）                                                               | Jest（80% カバレッジ必須）                       |
-| テンプレート同期   | —                                                                            | 週次（自動 PR）                                  |
-| 組織レベルの認証   | —                                                                            | CLASPRC_JSON 共有シークレット（GitHub + GitLab） |
-
-> リッチな UI をクライアントサイドフレームワークで構築する場合は、[Apps Script Engine](https://github.com/WildH0g/apps-script-engine-template) が適しています。
-> 組織全体で 5 つ以上の小さな GAS 自動化を管理する場合は、Apps Script Fleet の出番です。
-
-## クイックスタート
-
-- **GitHub / GitHub Enterprise Server**: [docs/setup-github.ja.md](docs/setup-github.ja.md)
-- **GitLab.com / GitLab Self-Managed**: [docs/setup-gitlab.ja.md](docs/setup-gitlab.ja.md)
-
-## CI/CD パイプライン
-
-GitHub Actions と GitLab CI の両方の設定が含まれています。push 先のプラットフォームで同じパイプラインが動きます。CI/CD 変数の設定以外の追加セットアップは不要です。
-
-### GitHub Actions
-
-```
-Push / PR  →  CI (ci.yml)  →  CD (cd.yml)
-               ├── Lint          └── Build
-               ├── Typecheck         └── clasp push
-               ├── Test                  └── clasp deploy
-               └── Build
+# チェック → ビルド → デプロイ
+pnpm run deploy
 ```
 
-| トリガー            | パイプライン   | 動作                                         |
-| ------------------- | -------------- | -------------------------------------------- |
-| `main` への PR      | CI のみ        | lint → typecheck → test → build              |
-| `dev` へのプッシュ  | CI → CD (dev)  | cancel-in-progress（後続が先行をキャンセル） |
-| `main` へのプッシュ | CI → CD (prod) | queued（順次実行、スキップなし）             |
+### 3. スクリプトプロパティの設定
 
-### GitLab CI
+Google Apps Script エディタでコンソールを開き、以下を実行:
 
-`.gitlab-ci.yml` は `.gitlab/` 内の分割設定ファイル（ci.yml, cd.yml, sync-template.yml）をインクルードします。変数設定や Self-Managed runner の要件は [docs/setup-gitlab.ja.md](docs/setup-gitlab.ja.md) を参照してください。
+```javascript
+setSlackConfig("xoxb-your-bot-token", "C01234567890");
+```
 
-| ジョブ          | ステージ | トリガー            |
-| --------------- | -------- | ------------------- |
-| `check`         | check    | push / MR           |
-| `deploy_dev`    | deploy   | `dev` への push     |
-| `deploy_prod`   | deploy   | `main` への push    |
-| `template_sync` | sync     | スケジュール / 手動 |
+以下のスクリプトプロパティが設定されます:
 
-### Pre/Post-Deploy フック
+| プロパティ | 説明 |
+| --- | --- |
+| `SLACK_BOT_TOKEN` | Slack Bot Token |
+| `SLACK_CHANNEL_ID` | 通知先チャンネル ID |
 
-テンプレート管理ファイルを変更せずにデプロイパイプラインをカスタマイズ：
+`LAST_PROCESSED_ROW` は初回の `checkNewRows` 実行時に自動設定されます（デフォルト: `1` でヘッダー行をスキップ）。
 
-- **GitHub Actions**: `.github/hooks/pre-deploy.sh` または `.github/hooks/post-deploy.sh` を作成
-- **GitLab CI**: `.gitlab/pre-deploy.yml` または `.gitlab/post-deploy.yml` を作成
+### 4. 時間駆動トリガーの設定
 
-これらのファイルはテンプレートからの同期対象外です。
+Apps Script エディタ → **トリガー** → **トリガーを追加**:
+
+| 設定項目 | 値 |
+| --- | --- |
+| 実行する関数 | `checkNewRows` |
+| イベントのソース | 時間主導型 |
+| 時間ベースのトリガーのタイプ | 分タイマー |
+| 時間の間隔 | 5 分おき |
+
+## 開発コマンド
+
+| コマンド | 説明 |
+| --- | --- |
+| `pnpm run check` | lint + typecheck + test（全チェック） |
+| `pnpm run test` | Jest（カバレッジ付き） |
+| `pnpm run test -- --watch` | Jest ウォッチモード |
+| `pnpm run build` | TypeScript をバンドルして `dist/` に出力 |
+| `pnpm run deploy` | check → build → dev 環境へ clasp push |
+| `pnpm run deploy:prod` | check → build → 本番環境へ clasp push |
 
 ## プロジェクト構成
 
 ```
-your-project/
-├── src/
-│   ├── index.ts           # GAS エントリポイント（doGet 等）
-│   ├── greeting.ts        # ビジネスロジック（サンプル）
-│   └── app.html           # Web UI（サンプル）
-├── test/
-│   └── greeting.test.ts
-├── .github/workflows/
-│   ├── ci.yml             # CI: lint → typecheck → test → build
-│   ├── cd.yml             # CD: CI 成功後にデプロイ
-│   └── sync-template.yml  # 上流テンプレートとの同期
-├── .gitlab-ci.yml         # GitLab CI/CD ルート（.gitlab/*.yml をインクルード）
-├── .gitlab/
-│   ├── ci.yml             # CI: lint → typecheck → test → build
-│   ├── cd.yml             # CD: clasp push + deploy
-│   └── sync-template.yml  # テンプレート同期（スケジュール実行）
-├── rollup.config.mjs
-├── tsconfig.json
-├── jest.config.json
-├── eslint.config.mjs
-├── renovate.json          # 自動更新設定
-└── .templatesyncignore    # プロジェクト固有のコードは上書きされない
+src/
+├── index.ts          # GAS エントリポイント（checkNewRows, setSlackConfig）
+├── sheet-reader.ts   # スプレッドシート行抽出ロジック
+└── slack-message.ts  # Slack メッセージペイロード構築ロジック
+test/
+├── sheet-reader.test.ts
+└── slack-message.test.ts
 ```
 
-## 開発ワークフロー
+## 注意事項
 
-### 日常の開発
-
-```
-# src/ を編集 → チェック → dev にデプロイ → 動作確認
-pnpm run check
-pnpm run deploy
-```
-
-### PR フロー
-
-1. feature ブランチを作成
-2. コミット — husky が lint-staged を自動実行
-3. プッシュして PR を作成 — CI が自動実行
-4. `main` にマージ — CD が本番にデプロイ
-
-### 利用可能なコマンド
-
-| コマンド                   | 説明                                                |
-| -------------------------- | --------------------------------------------------- |
-| `pnpm run check`           | lint + lint:css + lint:html + 型チェック + テスト |
-| `pnpm run build`           | TypeScript をバンドル + アセットを `dist/` にコピー |
-| `pnpm run deploy`          | check → build → dev にデプロイ                      |
-| `pnpm run deploy:prod`     | check → build → 本番にデプロイ                      |
-| `pnpm run test -- --watch` | Jest のウォッチモード                               |
-
-## リポジトリの同期
-
-### Template Sync
-
-- **GitHub**: `sync-template.yml` ワークフローが週次で上流テンプレートの更新をチェック。更新がある場合、`template-sync` ラベル付きの PR が自動作成されます。
-- **GitLab**: Group 内に Template Project を作成し、「Create from template」で各 GAS プロジェクトを作成。User Project は `TEMPLATE_REPO_URL`（Group Variable）経由で Template Project から同期します。詳細は [docs/setup-gitlab.ja.md](docs/setup-gitlab.ja.md) を参照。
-
-`.templatesyncignore` はホワイトリスト形式を採用しています — `:!` プレフィックス付きのファイルのみが同期対象です。プロジェクト固有のファイル（`src/`, `test/`, `README.md` 等）は自動的に除外されます。
-
-### Renovate
-
-[`h13/renovate-config:node`](https://github.com/h13/renovate-config) の共有プリセットで設定：
-
-- minor / patch: オートマージ
-- major: 手動レビュー用の PR を作成（`breaking` ラベル付き）
-- devDependencies: グループ化してオートマージ
-- リリースから 7 日間の安定性バッファ
-- 毎週日曜 21 時以降に実行
-
-## カスタマイズ
-
-### OAuth スコープの追加
-
-`appsscript.json` の `oauthScopes` を編集：
-
-```json
-{
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/spreadsheets"
-  ]
-}
-```
-
-### ソースファイルの追加
-
-1. `src/` にモジュールを作成（例: `src/utils.ts`）
-2. `src/index.ts` でインポート — Rollup がすべてをバンドル
-3. `test/` にテストを追加
-
-> GAS から呼び出せるのは `src/index.ts` のトップレベルに定義された関数のみです。
-
-### カバレッジ閾値の調整
-
-`jest.config.json` の `coverageThreshold` を編集。デフォルトは全メトリクス 80% です。スコープの小さなプロジェクト（関数 5〜10 個）では 100% への引き上げを推奨します。
-
-## テスト
-
-テストは `test/` に配置し、Jest で実行します。`src/index.ts` はカバレッジ対象外です（`HtmlService` 等の GAS グローバルは Node.js で実行できないため）。
-
-```
-pnpm run test              # カバレッジ付きで実行
-pnpm run test -- --watch   # ウォッチモード
-```
-
-## FAQ
-
-### なぜモノレポではなく 1 リポ 1 機能？
-
-GAS プロジェクトは基本的に小さく自己完結した自動化です。モノレポはワークスペースツーリングや選択的デプロイなど、このスケールでは割に合わない複雑さを持ち込みます。リポを分けることで、独立した CI/CD、明確なオーナーシップ、シンプルなメンタルモデルが得られます。Template Sync と Renovate がメンテナンスのオーバーヘッドを吸収します。
-
-### なぜデフォルトでカバレッジ 80%？
-
-小さく焦点の絞られた GAS 関数であれば、高いカバレッジは現実的に達成可能で、本番に届く前に微妙なバグを捕捉します。80% は採用障壁を低く保ちつつ、意味のある品質ゲートとして機能します。スコープが小さなプロジェクト（関数 5〜10 個）では、`jest.config.json` で 100% への引き上げを検討してください。
+- `src/index.ts` の関数に `export` キーワードは付けない（GAS ランタイムは ES モジュール構文を認識できない）
+- `src/index.ts` はテストカバレッジ対象外（GAS グローバル `SpreadsheetApp` 等が Node.js 環境で実行不可のため）
+- カバレッジ閾値: 全メトリクス 80%（`jest.config.json` で変更可）
+- `LAST_PROCESSED_ROW` は初回実行時にデフォルト値 `1` が設定され、ヘッダー行をスキップします
 
 ## ライセンス
 
-[MIT](LICENSE)
+MIT
