@@ -40,33 +40,27 @@ echo '{"scriptId":"YOUR_SCRIPT_ID","rootDir":"dist"}' > .clasp-dev.json
 pnpm run deploy
 ```
 
-### 3. スクリプトプロパティの設定
+### 3. Script Properties の設定
 
-Google Apps Script エディタでコンソールを開き、以下を実行:
-
-```javascript
-setSlackConfig("xoxb-your-bot-token", "C01234567890");
-```
-
-以下のスクリプトプロパティが設定されます:
+Apps Script エディタ: プロジェクトの設定（歯車アイコン）→ スクリプト プロパティ → 以下を追加:
 
 | プロパティ | 説明 |
 | --- | --- |
-| `SLACK_BOT_TOKEN` | Slack Bot Token |
-| `SLACK_CHANNEL_ID` | 通知先チャンネル ID |
+| `SLACK_BOT_TOKEN` | Slack Bot User OAuth Token (`xoxb-...`) |
+| `SLACK_CHANNEL_ID` | 通知先チャンネル ID（`C01234567` 形式） |
 
 `LAST_PROCESSED_ROW` は初回の `checkNewRows` 実行時に自動設定されます（デフォルト: `1` でヘッダー行をスキップ）。
 
-### 4. 時間駆動トリガーの設定
+### 4. トリガーの設定
 
-Apps Script エディタ → **トリガー** → **トリガーを追加**:
+Script Properties でスケジュールを設定（任意）:
 
-| 設定項目 | 値 |
-| --- | --- |
-| 実行する関数 | `checkNewRows` |
-| イベントのソース | 時間主導型 |
-| 時間ベースのトリガーのタイプ | 分タイマー |
-| 時間の間隔 | 5 分おき |
+| プロパティ | 値 | デフォルト |
+|------------|------|-----------|
+| `TRIGGER_INTERVAL` | `1min`, `5min`, `10min`, `hourly`, `daily` | `5min` |
+| `TRIGGER_HOUR` | `0`〜`23`（`daily` 時のみ使用） | `9` |
+
+Apps Script エディタで `setupTrigger` を選択して ▶ 実行。初回は `script.scriptapp` スコープの承認が必要。
 
 ## 開発コマンド
 
@@ -83,7 +77,7 @@ Apps Script エディタ → **トリガー** → **トリガーを追加**:
 
 ```
 src/
-├── index.ts          # GAS エントリポイント（checkNewRows, setSlackConfig）
+├── index.ts          # GAS エントリポイント（checkNewRows, setupTrigger）
 ├── sheet-reader.ts   # スプレッドシート行抽出ロジック
 └── slack-message.ts  # Slack メッセージペイロード構築ロジック
 test/

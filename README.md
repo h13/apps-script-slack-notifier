@@ -42,31 +42,25 @@ pnpm run deploy
 
 ### 3. Set Script Properties
 
-Open the console in the Google Apps Script editor and run:
-
-```javascript
-setSlackConfig("xoxb-your-bot-token", "C01234567890");
-```
-
-This sets the following script properties:
+In the Apps Script editor: Project Settings (gear icon) → Script Properties → add:
 
 | Property | Description |
 | --- | --- |
-| `SLACK_BOT_TOKEN` | Slack Bot Token |
-| `SLACK_CHANNEL_ID` | Target channel ID |
+| `SLACK_BOT_TOKEN` | Slack Bot User OAuth Token (`xoxb-...`) |
+| `SLACK_CHANNEL_ID` | Target channel ID (`C01234567` format) |
 
 `LAST_PROCESSED_ROW` is set automatically on the first run of `checkNewRows` (defaults to `1` to skip the header row).
 
-### 4. Set Up a Time-Driven Trigger
+### 4. Set Up Trigger
 
-In the Apps Script editor, go to **Triggers** → **Add Trigger**:
+Add optional Script Properties to configure the schedule:
 
-| Setting | Value |
-| --- | --- |
-| Function to run | `checkNewRows` |
-| Event source | Time-driven |
-| Type of time-based trigger | Minutes timer |
-| Interval | Every 5 minutes |
+| Property | Values | Default |
+|----------|--------|---------|
+| `TRIGGER_INTERVAL` | `1min`, `5min`, `10min`, `hourly`, `daily` | `5min` |
+| `TRIGGER_HOUR` | `0`–`23` (only used with `daily`) | `9` |
+
+Run `setupTrigger` in the Apps Script editor (▶). First run requires `script.scriptapp` scope authorization.
 
 ## Development Commands
 
@@ -83,7 +77,7 @@ In the Apps Script editor, go to **Triggers** → **Add Trigger**:
 
 ```
 src/
-├── index.ts          # GAS entry points (checkNewRows, setSlackConfig)
+├── index.ts          # GAS entry points (checkNewRows, setupTrigger)
 ├── sheet-reader.ts   # Spreadsheet row extraction logic
 └── slack-message.ts  # Slack message payload builder
 test/

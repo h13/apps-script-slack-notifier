@@ -1,6 +1,41 @@
 import { extractNewRows } from "./sheet-reader.js";
 import { buildSlackPayload } from "./slack-message.js";
 
+function setupTrigger(): void {
+  const props = PropertiesService.getScriptProperties();
+  const interval = props.getProperty("TRIGGER_INTERVAL") ?? "5min";
+  const hour = Number(props.getProperty("TRIGGER_HOUR") ?? "9");
+
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const trigger of triggers) {
+    if (trigger.getHandlerFunction() === "checkNewRows") {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  }
+
+  const builder = ScriptApp.newTrigger("checkNewRows").timeBased();
+
+  switch (interval) {
+    case "1min":
+      builder.everyMinutes(1).create();
+      break;
+    case "10min":
+      builder.everyMinutes(10).create();
+      break;
+    case "hourly":
+      builder.everyHours(1).create();
+      break;
+    case "daily":
+      builder.everyDays(1).atHour(hour).create();
+      break;
+    default:
+      builder.everyMinutes(5).create();
+      break;
+  }
+
+  Logger.log(`Trigger created: checkNewRows (${interval})`);
+}
+
 function checkNewRows(): void {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty("SLACK_BOT_TOKEN");
@@ -38,10 +73,4 @@ function checkNewRows(): void {
   }
 
   props.setProperty("LAST_PROCESSED_ROW", String(allRows.length));
-}
-
-function setSlackConfig(token: string, channelId: string): void {
-  const props = PropertiesService.getScriptProperties();
-  props.setProperty("SLACK_BOT_TOKEN", token);
-  props.setProperty("SLACK_CHANNEL_ID", channelId);
 }
