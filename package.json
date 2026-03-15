@@ -1,10 +1,10 @@
 {
-  "name": "apps-script-slack-notifier",
+  "name": "apps-script-fleet",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm run clean && pnpm run bundle && cp appsscript.json dist/appsscript.json",
+    "build": "pnpm run clean && pnpm run bundle && cp appsscript.json dist/appsscript.json && cp src/*.html dist/",
     "bundle": "rollup --no-treeshake -c rollup.config.mjs",
     "check": "pnpm run lint && pnpm run lint:css && pnpm run lint:html && pnpm run typecheck && pnpm run test",
     "clean": "rimraf build dist",
@@ -12,7 +12,7 @@
     "deploy:prod": "pnpm run check && pnpm run build && cp .clasp-prod.json .clasp.json && clasp push",
     "format": "prettier --write .",
     "lint": "eslint --fix src/ test/",
-    "lint:css": "stylelint --allow-empty-input '**/*.{css,scss,html}'",
+    "lint:css": "stylelint '**/*.{css,scss,html}'",
     "lint:html": "htmlhint --ignore 'coverage/**,dist/**' '**/*.html'",
     "prepare": "husky",
     "test": "jest test/ --passWithNoTests --detectOpenHandles --coverage",
