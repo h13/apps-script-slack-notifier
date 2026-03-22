@@ -21,8 +21,12 @@ template_sync:
       git config user.email "gitlab-ci@$CI_SERVER_HOST"
       git config user.name "GitLab CI"
 
-      # Fetch upstream template
-      git remote add template "$TEMPLATE_REPO_URL" || true
+      # Fetch upstream template (inject CI_JOB_TOKEN for same-instance GitLab URLs)
+      FETCH_URL="$TEMPLATE_REPO_URL"
+      if echo "$TEMPLATE_REPO_URL" | grep -q "$CI_SERVER_HOST"; then
+        FETCH_URL=$(echo "$TEMPLATE_REPO_URL" | sed "s|https://|https://gitlab-ci-token:${CI_JOB_TOKEN}@|")
+      fi
+      git remote add template "$FETCH_URL" || true
       git fetch template main
 
       # Build include list from .templatesyncignore (whitelist: :! prefixed lines)
