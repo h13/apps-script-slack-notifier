@@ -1,5 +1,13 @@
 {
-  "preset": "ts-jest",
+  "transform": {
+    "^.+\\.tsx?$": [
+      "babel-jest",
+      {
+        "presets": ["@babel/preset-typescript"],
+        "plugins": ["@babel/plugin-transform-modules-commonjs"]
+      }
+    ]
+  },
   "testEnvironment": "node",
   "modulePathIgnorePatterns": ["<rootDir>/dist/", "<rootDir>/build/"],
   "testPathIgnorePatterns": ["<rootDir>/dist/", "<rootDir>/build/"],
