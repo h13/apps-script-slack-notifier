@@ -2,7 +2,7 @@
 
 check:
   stage: check
-  image: node:24@sha256:3a09aa6354567619221ef6c45a5051b671f953f0a1924d1f819ffb236e520e6b
+  image: node:24@sha256:5711a0d445a1af54af9589066c646df387d1831a608226f4cd694fc59e745059
   before_script:
     - corepack enable
     - pnpm config set store-dir .pnpm-store
@@ -20,7 +20,7 @@ check:
 
 templatesyncignore_check:
   stage: check
-  image: alpine/git@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
+  image: alpine/git@sha256:77418e6e7c7f434c4a98eaff04ef16840cf03649c881c03948e3e213923e3136
   script:
     - |
       set -f  # disable globbing to safely expand $WHITELIST
