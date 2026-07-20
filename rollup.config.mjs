@@ -1,5 +1,5 @@
 import cleanup from 'rollup-plugin-cleanup';
-import typescript from 'rollup-plugin-typescript2';
+import esbuild from 'rollup-plugin-esbuild';
 
 export default {
   input: 'src/index.ts',
@@ -7,6 +7,6 @@ export default {
     dir: 'dist',
     format: 'esm',
   },
-  plugins: [cleanup({ comments: 'none', extensions: ['.ts'] }), typescript()],
+  plugins: [cleanup({ comments: 'none', extensions: ['.ts'] }), esbuild()],
   context: 'this',
 };
