@@ -44,9 +44,9 @@ pnpm run deploy
 
 Apps Script エディタ: プロジェクトの設定（歯車アイコン）→ スクリプト プロパティ → 以下を追加:
 
-| プロパティ | 説明 |
-| --- | --- |
-| `SLACK_BOT_TOKEN` | Slack Bot User OAuth Token (`xoxb-...`) |
+| プロパティ         | 説明                                    |
+| ------------------ | --------------------------------------- |
+| `SLACK_BOT_TOKEN`  | Slack Bot User OAuth Token (`xoxb-...`) |
 | `SLACK_CHANNEL_ID` | 通知先チャンネル ID（`C01234567` 形式） |
 
 `LAST_PROCESSED_ROW` は初回の `checkNewRows` 実行時に自動設定されます（デフォルト: `1` でヘッダー行をスキップ）。
@@ -55,23 +55,23 @@ Apps Script エディタ: プロジェクトの設定（歯車アイコン）→
 
 Script Properties でスケジュールを設定（任意）:
 
-| プロパティ | 値 | デフォルト |
-|------------|------|-----------|
-| `TRIGGER_INTERVAL` | `1min`, `5min`, `10min`, `hourly`, `daily` | `5min` |
-| `TRIGGER_HOUR` | `0`〜`23`（`daily` 時のみ使用） | `9` |
+| プロパティ         | 値                                         | デフォルト |
+| ------------------ | ------------------------------------------ | ---------- |
+| `TRIGGER_INTERVAL` | `1min`, `5min`, `10min`, `hourly`, `daily` | `5min`     |
+| `TRIGGER_HOUR`     | `0`〜`23`（`daily` 時のみ使用）            | `9`        |
 
 Apps Script エディタで `setupTrigger` を選択して ▶ 実行。初回は `script.scriptapp` スコープの承認が必要。
 
 ## 開発コマンド
 
-| コマンド | 説明 |
-| --- | --- |
-| `pnpm run check` | lint + typecheck + test（全チェック） |
-| `pnpm run test` | Jest（カバレッジ付き） |
-| `pnpm run test -- --watch` | Jest ウォッチモード |
-| `pnpm run build` | TypeScript をバンドルして `dist/` に出力 |
-| `pnpm run deploy` | check → build → dev 環境へ clasp push |
-| `pnpm run deploy:prod` | check → build → 本番環境へ clasp push |
+| コマンド                   | 説明                                     |
+| -------------------------- | ---------------------------------------- |
+| `pnpm run check`           | lint + typecheck + test（全チェック）    |
+| `pnpm run test`            | Jest（カバレッジ付き）                   |
+| `pnpm run test -- --watch` | Jest ウォッチモード                      |
+| `pnpm run build`           | TypeScript をバンドルして `dist/` に出力 |
+| `pnpm run deploy`          | check → build → dev 環境へ clasp push    |
+| `pnpm run deploy:prod`     | check → build → 本番環境へ clasp push    |
 
 ## プロジェクト構成
 
@@ -96,8 +96,8 @@ test/
 
 これらのプロジェクトは閲覧可能です:
 
-| 環境 | リンク |
-|------|--------|
+| 環境        | リンク                                                                                                           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------- |
 | Development | [Apps Script で開く](https://script.google.com/d/1pfBRAp_JKYROuX_KD_4-EImm9SLQhU6CBgxnXKs-ev8wOzByF2QzEUjW/edit) |
 | Production  | [Apps Script で開く](https://script.google.com/d/1qi5u32JHvWmIPpIcyNQEjLzdTjot21qCLpRlWR1BHm4nMq2LdPUw842i/edit) |
 
