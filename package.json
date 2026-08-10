@@ -25,7 +25,7 @@
     "@types/google-apps-script": "2.0.12",
     "@types/jest": "30.0.0",
     "babel-jest": "30.4.1",
-    "esbuild": "0.28.1",
+    "esbuild": "0.28.2",
     "htmlhint": "1.9.2",
     "husky": "9.1.7",
     "jest": "30.4.2",
