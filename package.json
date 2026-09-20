@@ -24,7 +24,7 @@
     "@google/clasp": "3.4.1",
     "@types/google-apps-script": "2.0.13",
     "@types/jest": "30.0.0",
-    "babel-jest": "30.5.1",
+    "babel-jest": "30.5.2",
     "esbuild": "0.28.2",
     "htmlhint": "1.9.2",
     "husky": "9.1.7",
