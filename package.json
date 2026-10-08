@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "8.0.1",
-    "@babel/preset-typescript": "8.0.1",
+    "@babel/preset-typescript": "8.0.7",
     "@google/clasp": "3.4.1",
     "@types/google-apps-script": "2.0.13",
     "@types/jest": "30.0.0",
