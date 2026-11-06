@@ -179,8 +179,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1(@types/node@26.6.5)(supports-color@10.2.2)
       '@types/google-apps-script':
-        specifier: 2.0.14
-        version: 2.0.14
+        specifier: 2.0.15
+        version: 2.0.15
       '@types/jest':
         specifier: 30.0.0
         version: 30.0.0
@@ -1551,8 +1551,8 @@ packages:
   '@types/estree@1.0.10':
     resolution: {integrity: sha512-lTyOMnOcmRBzdCv6/4zUZCrEhV0xrqQiUZBZtVcbmLHBXKLnN8q89v/wKRF/Q0HbwVsqbIG3o5HDoFl9sduM+g==}
 
-  '@types/google-apps-script@2.0.14':
-    resolution: {integrity: sha512-/zz1aYjBgZTlCf4axe8xzEvpkNUlso1qqMoHKs3ov6VdTlIiKIVinWqTgavKHwR3kiflhm2B25OrqAUVNJtSUQ==}
+  '@types/google-apps-script@2.0.15':
+    resolution: {integrity: sha512-Mmz0zPNG6airLVK1KDy7sgU26HYhSdooOd5riBWMYk5iLel8jCeQu4EaOg7JIwMdEFhad/pNEeLpMt2dPlgnxQ==}
 
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
@@ -5041,7 +5041,7 @@ snapshots:
 
   '@types/estree@1.0.10': {}
 
-  '@types/google-apps-script@2.0.14': {}
+  '@types/google-apps-script@2.0.15': {}
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
