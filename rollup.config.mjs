@@ -1,5 +1,6 @@
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import swc from '@rollup/plugin-swc';
 import cleanup from 'rollup-plugin-cleanup';
-import esbuild from 'rollup-plugin-esbuild';
 
 export default {
   input: 'src/index.ts',
@@ -7,6 +8,10 @@ export default {
     dir: 'dist',
     format: 'esm',
   },
-  plugins: [cleanup({ comments: 'none', extensions: ['.ts'] }), esbuild()],
+  plugins: [
+    cleanup({ comments: 'none', extensions: ['.ts'] }),
+    nodeResolve({ extensions: ['.js', '.ts'] }),
+    swc(),
+  ],
   context: 'this',
 };
